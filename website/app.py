@@ -5,7 +5,7 @@ from datetime import datetime
 import json
 sys.path.insert(0, '../')
 import DB
-import testSytadin
+import Sytadin
 
 app = Flask(__name__)
 
