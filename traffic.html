@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Synchronous Loading</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 512px;
+		width: 512px;
+      }
+	  #rdy{
+		width:0px;
+		height:0px;
+	  }
+    </style>
+	<script src="jquery-3.1.1.min.js"></script>
+  </head>
+  <body>
+    <div id="map"></div>
+	<div id="rdy"></div>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFvgPKf_E9Xufp4XeLm2ygAD2Ay9rzjAo&callback=initMap&"></script>
+    <script>
+	
+	    var myStyle = [
+       {
+         featureType: "all",
+         elementType: "all",
+         stylers: [
+           { visibility: "off" }
+         ]
+       }
+     ];
+
+		var map = new google.maps.Map(document.getElementById('map'), {
+		  center: {lat: 48.861736, lng: 2.343226},
+		  zoom: 10,
+		  disableDefaultUI: true,
+		  mapTypeId: 'mystyle'
+		});
+		
+		var trafficLayer = new google.maps.TrafficLayer();
+		trafficLayer.setMap(map);
+		
+		map.mapTypes.set('mystyle', new google.maps.StyledMapType(myStyle, { name: 'My Style' }));
+		//console.log('rdy')
+		
+		//setTimeout(function () { $('#rdy').html('ok') }, 3000);
+
+    </script>
+  </body>
+</html>

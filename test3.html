@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<style>
+
+.transition-display-text{
+	width:200px;
+	height:35px;
+}
+
+.transition-display-text-hider{
+	position:relative;
+	top:-35px;
+	height:100%;
+	width:100%;
+	left:0px;
+	background:white;
+}
+</style>
+
+<script src="d3.v4.min.js"></script>
+<script src="d3-scale-chromatic.v1.min.js"></script>
+<script src="topojson.v2.min.js"></script>
+<script src="jquery.min.js"></script>
+
+<link rel="stylesheet" href="bootstrap.min.css">
+<script src="jquery.slim.min.js"></script>
+<script src="tether.min.js"></script>
+<script src="bootstrap.min.js"></script>
+
+</head>
+<body>
+<div class="transition-display-text">Test 124 lo<div class="transition-display-text-hider"></div></div>
+<div id="map"></div>
+<div class="alert alert-warning" role="alert" id="tooltip1" hidden>
+	Name : <strong id="name"></strong></br>
+	PIB <strong id="pib"></strong> Millions €
+</div>
+
+<script>
+
+var width = 1024
+var height = 720
+
+var svg = d3.select('#map').append("svg")
+    .attr("id", "svg")
+    .attr("width", width)
+    .attr("height", height);
+ 
+var deps = svg.append("g");
+
+var datapib = [
+		{"code":75,"pib":75439},
+		{"code":95,"pib":25765},
+		{"code":94,"pib":29250},
+		{"code":93,"pib":27420},
+		{"code":92,"pib":73277},
+		{"code":91,"pib":26718},
+		{"code":78,"pib":30507},
+		{"code":77,"pib":26583}
+]
+
+var x = d3.scaleLinear()
+    .domain([1, 10])
+    .rangeRound([22000, 78000]);
+
+var color = d3.scaleThreshold()
+    .domain(d3.range(1, 20))
+    .range(d3.schemeGreens[9]);
+	
+var g = svg.append("g")
+    .attr("class", "key")
+    .attr("transform", "translate(0,40)");
+
+g.selectAll("rect")
+  .data(color.range().map(function(d) {
+      d = color.invertExtent(d);
+      if (d[0] == null) d[0] = x.domain()[0];
+      if (d[1] == null) d[1] = x.domain()[1];
+      return d;
+    }))
+  .enter().append("rect")
+    .attr("height", 8)
+    .attr("x", function(d) { return d[0]*50 })
+    .attr("width", function(d) { 
+		return 50 })
+    .attr("fill", function(d) { return color(d[0]); });
+
+g.append("text")
+    .attr("class", "caption")
+    .attr("x", 50)
+    .attr("y", -6)
+    .attr("fill", "#000")
+    .attr("text-anchor", "start")
+    .attr("font-weight", "bold")
+    .text("PIB par région en €");
+
+g.call(d3.axisBottom(x)
+    .tickSize(13)
+    .tickFormat(function(x, i) { return i ? x : x + "%"; })
+    .tickValues(color.domain()))
+  .select(".domain")
+    .remove();
+
+var dataSET = d3.map();
+datapib.forEach( function (d) { dataSET.set(d.code, +d.pib)})
+
+
+	
+var path = d3.geoPath();
+var formatThousandComma = d3.format(",")
+var formatThousandCommaFRENCH = function(d) { return formatThousandComma(d).replace(',',' ');}
+
+var div = d3.select("body").append("div")   
+    .attr("class", "tooltip")               
+    .style("opacity", 0);
+
+var projection = d3.geoConicConformal()
+    .center([2.454071, 46.279229])
+    .scale(20000)
+    .translate([width / 2 + 100, height / 2 + 800]);
+
+path.projection(projection);
+	
+
+
+d3.json('fr-idf-departements.json', function(req, geojson) {
+	console.log(geojson)
+	
+	geojson.features.forEach( function(o) { 
+		o.pib = dataSET.get(o.properties.code)
+		//o.code = o.properties.code
+	});
+	
+	deps.selectAll("path")
+        .data(geojson.features)
+        .enter()
+        .append("path")
+        .attr('class', 'department')
+		.attr("fill", function(d) {
+			return color(x.invert(d.pib)); 
+			//return d3.rgb(0,255-x.invert(d.pib)*2,0)
+		})
+		.attr('stroke','black')
+		.attr('stroke-opacity',0.3)
+        .attr("d", path)
+        .on("mouseover", function(d) {
+            div.transition()        
+                .duration(200)
+                .style("opacity", 1);      
+            div.style("left", (d3.event.pageX + 30) + "px")     
+                .style("top", (d3.event.pageY - 30) + "px")
+				//.html('<div id="name">'+d.properties.nom+'</div><div id="pib">'+d.pib+' � </div>')
+				.html('<div id="Cursor"></div>')
+				
+				
+			var t = $('#tooltip1').clone().addClass('tooltip-i1').removeAttr('hidden')
+			
+			t.children('#name').text(d.properties.nom)
+			$('#Cursor').append(t)
+			d3.selectAll('.tooltip-i1>#pib').text(function () { return formatThousandCommaFRENCH(d.pib)})
+			console.log(d.pib)
+			
+			
+			console.log(d.properties)
+
+        })
+        .on("mouseout", function(d) {
+            div.transition()
+                .duration(500)
+                .style("opacity", 0);
+            div.style("left", "0px")
+                .style("top", "0px");
+			$('#Cursor').remove()
+        });
+});
+
+
+</script>
+</body>
+</html>
