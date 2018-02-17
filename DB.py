@@ -10,7 +10,6 @@ import trafficSight_conf
 def getTrafficPOSTGRES(dateStart,dateEnd):
 	dS = int(time.mktime(dateStart.timetuple()) * 1000)
 	dE = int(time.mktime(dateEnd.timetuple()) * 1000)
-	print(dS)
 
 	try:
 		c=trafficSight_conf.getDBconf()
@@ -28,17 +27,16 @@ def getTrafficPOSTGRES(dateStart,dateEnd):
 	cur = conn.cursor()
 	qry=""" SELECT * FROM public."Traffic" where date_raw >=  """+str(dS)+""" and date_raw <"""+str(dE)+""" ; """
 	
-	print(qry)
 	try:
 		cur.execute(qry)
 		rows = cur.fetchall()
 		result=list()
 		for row in rows:
 			result.append({
-				'road_value_lvl_1' : row[2],
-				'road_value_lvl_2' : row[3],
-				'road_value_lvl_3' : row[4],
-				'road_value_lvl_4' : row[5],
+				'r1' : row[2],#roadlvl_1
+				'r2' : row[3],
+				'r3' : row[4],
+				'r4' : row[5],
 				'date_raw'         : row[6]
 			});
 		return result
