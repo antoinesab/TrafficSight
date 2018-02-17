@@ -5,31 +5,32 @@ import psycopg2
 from datetime import datetime
 import DB
 
+PIXEL_PER_KM = 40.8
+AVG_DETECTED_KM = 49000
 
 def main():	
-	
 	nowDT = datetime.now()
-	createDAYRepositoryIFNOTEXISTS(nowDT)
 	
-	
-	
-	runExtractGMData()
-	lastImage=getOldedImage()
-	pathImage=removeImageToDayRepository(lastImage['filename'],str(nowDT.date()))
-	resTraffic=analyseTrafficImage(pathImage)
-	insertTrafficPOSTGRES({
-		'filename':"'"+pathImage+"'",
-		'road_value_lvl_1':resTraffic['road_value_lvl_1'],
-		'road_value_lvl_2':resTraffic['road_value_lvl_2'],
-		'road_value_lvl_3':resTraffic['road_value_lvl_3'],
-		'road_value_lvl_4':resTraffic['road_value_lvl_4'],
-		'date_raw':lastImage['dateRaw']
-	});
-	print('DONE',str(nowDT))
+	#On enrengistre de 5h du matin à minuit
+	if nowDT.hour >= 5:
+		createDAYRepositoryIFNOTEXISTS(nowDT)
+		runExtractGMData()
+		lastImage=getOldedImage()
+		pathImage=removeImageToDayRepository(lastImage['filename'],str(nowDT.date()))
+		resTraffic=analyseTrafficImage(pathImage)
+		DB.insertTrafficPOSTGRES({
+			'filename':"'"+pathImage+"'",
+			'road_value_lvl_1':resTraffic['road_value_lvl_1'],
+			'road_value_lvl_2':resTraffic['road_value_lvl_2'],
+			'road_value_lvl_3':resTraffic['road_value_lvl_3'],
+			'road_value_lvl_4':resTraffic['road_value_lvl_4'],
+			'date_raw':lastImage['dateRaw']
+		});
+		print('DONE',str(nowDT))
 
 	
 def runExtractGMData():
-	os.system("phantomjs.exe GM_DATA_EXTRACT.js")
+	os.system("phantomjs GM_DATA_EXTRACT.js")
 
 	
 #Return path new image(after remove)
@@ -52,13 +53,13 @@ def analyseTrafficImage(filename):
 
 	for i in range(0, nbX-1):
 		for j in range(0,nbY-1):
-			if(pix[i,j][0] > 220 and pix[i,j][0] < 240 and pix[i,j][1] < 10 and pix[i,j][2] < 10):
+			if(pix[i,j][0] > 235 and pix[i,j][0] < 250 and pix[i,j][1] < 70 and pix[i,j][1] > 55 and pix[i,j][2] < 55 and pix[i,j][2] > 45):
 				pixelsBouchons=pixelsBouchons+1
-			if(pix[i,j][0] > 125 and pix[i,j][0] < 140 and pix[i,j][1] < 210 and pix[i,j][1] > 195 and pix[i,j][2] < 85 and pix[i,j][2] > 75):
+			if(pix[i,j][0] > 95 and pix[i,j][0] < 105 and pix[i,j][1] < 220 and pix[i,j][1] > 205 and pix[i,j][2] < 110 and pix[i,j][2] > 100):
 				pixelsFluide=pixelsFluide+1
-			if(pix[i,j][0] > 235 and pix[i,j][0] < 250 and pix[i,j][1] < 130 and pix[i,j][1] > 115 and pix[i,j][2] < 10 and pix[i,j][2] > 0):
+			if(pix[i,j][0] > 250 and pix[i,j][0] < 256 and pix[i,j][1] < 160 and pix[i,j][1] > 145 and pix[i,j][2] < 80 and pix[i,j][2] > 75):
 				pixelsIntermediaire=pixelsIntermediaire+1
-			if(pix[i,j][0] > 150 and pix[i,j][0] < 165 and pix[i,j][1] < 25 and pix[i,j][1] > 15 and pix[i,j][2] < 25 and pix[i,j][2] > 15):
+			if(pix[i,j][0] > 125 and pix[i,j][0] < 135 and pix[i,j][1] < 32 and pix[i,j][1] > 27 and pix[i,j][2] < 32 and pix[i,j][2] > 27 ):
 				pixelsGrosBouchons=pixelsGrosBouchons+1
 
 	
@@ -93,44 +94,6 @@ def getOldedImage():
 		
 	return allFilesWithDates[maxIndex]
 	
-#def insertTrafficPOSTGRES(obj):
-#	try:
-#		conn = psycopg2.connect("dbname='Sytadin' user='Sytadin_user' host='localhost' password='admin123'")
-#		conn.autocommit = True
-#	except:
-#		print('--I am unable to connect to the database')
-#		return 0;
-#		
-#	obj['id']=1
-#	
-#	cur = conn.cursor()
-#	qry=""" SELECT max("id_Traffic") FROM public."Traffic"; """
-#	try:
-#		cur.execute(qry)
-#	except:
-#		print('--Erreur DB')
-#		print(cur.query)
-#	rows = cur.fetchall()
-#	if len(rows) > 0 and rows[0][0] is not None:
-#		obj['id']=rows[0][0]+1
-#
-#	cstrParameters=','.join([
-#		obj['filename'],
-#		str(obj['id']),
-#		str(obj['road_value_lvl_1']),
-#		str(obj['road_value_lvl_2']),
-#		str(obj['road_value_lvl_3']),
-#		str(obj['road_value_lvl_4']),
-#		str(obj['date_raw'])
-#	])
-#	try:
-#		cur2 = conn.cursor()
-#		cur2.execute("""INSERT INTO public."Traffic"("filename_Image", "id_Traffic", road_value_lvl_1, road_value_lvl_2, road_value_lvl_3, road_value_lvl_4, date_raw)
-#	VALUES (%(filename)s,%(id)s,%(road_value_lvl_1)s,%(road_value_lvl_2)s,%(road_value_lvl_3)s,%(road_value_lvl_4)s,%(date_raw)s);""",obj)
-#	except:
-#		print('--Erreur DB')
-#		print(cur2.query)
-		
 #dt: datetime 
 def createDAYRepositoryIFNOTEXISTS(dt):
 	nowDT = datetime
@@ -141,6 +104,47 @@ def createDAYRepositoryIFNOTEXISTS(dt):
 		print('--Creating new directory',str(dt.date()))
 		os.mkdir("StImages/"+str(dt.date()))
 		return 1
+		
+# 
+#
+def scalePixelToKm(pix):
+	return pix / PIXEL_PER_KM
+	
+# 
+#
+def normalizeKM(totalKM,KM):
+	try:
+		a=float(AVG_DETECTED_KM)/float(totalKM)
+		return KM * a
+	except:
+		return 0
+
+	
+# listCourbes un dico d'element de type array
+# abscisse un array
+def lisageCourbe(listCourbes,abscisse):
+
+	
+	for key,valeurs in enumerate(listCourbes):
+		#valeurs=[5,8,6,9,5,7,9,12,16,18,1,7,20,15,9,10,8,6,3,4,2,2,3,1]
+		#abscisse = range(0,30)
+		
+		nbPoints = math.floor(len(valeurs)/2)
+		valeursBis = [0] * nbPoints
+		tempsBis = [0] * nbPoints
+		i = 0
+		j = 0
+		while i<len(valeurs)-1 :
+			valeursBis[j] = int((valeurs[i] + valeurs[i+1])/2)
+			tempsBis[j] = int((abscisse[i] + abscisse[i+1])/2)
+			j = j + 1
+			i = i + 2
+			
+		#print(valeursBis)
+		#print(tempsBis)
+		#
+		#print(valeurs)
+		#print(temps)
 
 	
 if __name__ == '__main__':
