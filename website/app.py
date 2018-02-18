@@ -23,7 +23,7 @@ def index():
 	dStart = datetime.today().replace(hour=5,minute=0,second=0)
 	dEnd   = datetime.today().replace(hour=23,minute=59,second=59)
 	datas         = DB.getTrafficPOSTGRES(dStart,dEnd)
-	#datasForecast = DB.getTrafficStatsPOSTGRES(0)
+	datasForecast = DB.getTrafficStatsPOSTGRES(0)
 	
 	for data in datas:
 		#on normalise
@@ -40,21 +40,20 @@ def index():
 		data['r3'] = int(Sytadin.scalePixelToKm(data['r3']))
 		data['r4'] = int(Sytadin.scalePixelToKm(data['r4']))
 		
-	datasForecast=''
-	#for dataForecast in datasForecast:
-	#	totalKM=dataForecast['fr1']+dataForecast['fr2']+dataForecast['fr3']+dataForecast['fr4']
-	#	dataForecast['fr1'] = int(Sytadin.normalizeKM(totalKM,dataForecast['fr1']))
-	#	dataForecast['fr2'] = int(Sytadin.normalizeKM(totalKM,dataForecast['fr2']))
-	#	dataForecast['fr3'] = int(Sytadin.normalizeKM(totalKM,dataForecast['fr3']))
-	#	dataForecast['fr4'] = int(Sytadin.normalizeKM(totalKM,dataForecast['fr4']))
-	#	
-	#	
-	#	##on scale en KM
-	#	#dataForecast['fr1'] = int(Sytadin.scalePixelToKm(dataForecast['fr1']))
-	#	#dataForecast['fr2'] = int(Sytadin.scalePixelToKm(dataForecast['fr2']))
-	#	#dataForecast['fr3'] = int(Sytadin.scalePixelToKm(dataForecast['fr3']))
-	#	#dataForecast['fr4'] = int(Sytadin.scalePixelToKm(dataForecast['fr4']))
-	#	dataForecast=''
+		
+	for dataForecast in datasForecast:
+		totalKM=dataForecast['fr1']+dataForecast['fr2']+dataForecast['fr3']+dataForecast['fr4']
+		dataForecast['fr1'] = int(Sytadin.normalizeKM(totalKM,dataForecast['fr1']))
+		dataForecast['fr2'] = int(Sytadin.normalizeKM(totalKM,dataForecast['fr2']))
+		dataForecast['fr3'] = int(Sytadin.normalizeKM(totalKM,dataForecast['fr3']))
+		dataForecast['fr4'] = int(Sytadin.normalizeKM(totalKM,dataForecast['fr4']))
+		
+		
+		#on scale en KM
+		dataForecast['fr1'] = int(Sytadin.scalePixelToKm(dataForecast['fr1']))
+		dataForecast['fr2'] = int(Sytadin.scalePixelToKm(dataForecast['fr2']))
+		dataForecast['fr3'] = int(Sytadin.scalePixelToKm(dataForecast['fr3']))
+		dataForecast['fr4'] = int(Sytadin.scalePixelToKm(dataForecast['fr4']))
 
 	data_json = json.dumps(({'current_traffic':datas,'forecast_traffic':datasForecast}))
 	#data_json = json.dumps(datas)
