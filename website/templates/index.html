@@ -62,7 +62,7 @@
 
           <!-- Blog Post -->
           <div class="card mb-4">
-           <svg class="linechart" width="720" height="500"></svg>
+           <svg class="linechart" id="linechart-container"></svg>
             <div class="card-body">
               <h2 class="card-title">Situation normale</h2>
               <p class="card-text">Trafic normal au prévisions</p>
@@ -118,10 +118,19 @@ var data_xyz = {{ data_json|tojson }};
 var JSONObject = JSON.parse(data_xyz);
 console.log(JSONObject)
 
-var svg = d3.select(".linechart"),
-    margin = {top: 20, right: 20, bottom: 30, left: 50},
-    width = +svg.attr("width") - margin.left - margin.right,
-    height = +svg.attr("height") - margin.top - margin.bottom,
+var heightLinechart=parseInt(d3.select("#linechart-container").style("height"));
+var widthLinechart =parseInt(d3.select("#linechart-container").style("width"));
+
+
+
+var svg = d3.select(".linechart");
+
+svg.attr("width",widthLinechart);
+svg.attr("height",heightLinechart);
+
+var margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = +widthLinechart - margin.left - margin.right,
+    height = +heightLinechart - margin.top - margin.bottom,
     g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var parseTime = d3.timeParse("%d-%b-%y");
@@ -237,13 +246,13 @@ lineLegend.append("rect")
 	
 	
 /* Calendar*/
-/*
+
 var calendar = d3.select(".calendar")
 
  
  
  var calendar_blocks = calendar.selectAll(".dayblock")
-  .data(data_dailyReport)
+  .data(JSONObject.daily_report)
 	.enter()
 	.append("rect")
 	.attr("class", "dayblock")
@@ -253,7 +262,7 @@ var calendar = d3.select(".calendar")
 	.attr("height", 40)
 	.attr("x", function (d,i) { return (i%7)*40;})
 	.attr("y", function (d,i) { return Math.trunc(i/7)*40;})
-	*/
+	
 
 </script>
 </body>
