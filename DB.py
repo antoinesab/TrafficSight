@@ -25,7 +25,7 @@ def getTrafficPOSTGRES(dateStart,dateEnd):
 		return 0;
 
 	cur = conn.cursor()
-	qry=""" SELECT * FROM public."Traffic" where date_raw >=  """+str(dS)+""" and date_raw <"""+str(dE)+""" ; """
+	qry=""" SELECT * FROM public."Traffic" where date_raw >=  """+str(dS)+""" and date_raw <"""+str(dE)+""" order by date_raw desc; """
 	
 	try:
 		cur.execute(qry)
@@ -178,38 +178,39 @@ def getDailyReportPOSTGRES(opts):
 	if opts is None:
 		return -1
 	else:
-		if hasattr(opts, 'today'):
+		print(opts)
+		if 'today' in opts:
 			qry="""
 select 
-	date_traffic,
-	ratio_TrafficJam,
+	date_traffic::char(10),
+	ratio_TrafficJam::char(8),
 	flag_validity
-from view_traffic_interval_days 
+from view_traffic_ratio_interval_days 
 where date_traffic = now() ;""";
-		if hasattr(opts, 'day'):
+		if 'day' in opts:
 			qry="""
 select 
-	date_traffic,
-	ratio_TrafficJam,
+	date_traffic::char(10),
+	ratio_TrafficJam::char(8),
 	flag_validity
-from view_traffic_interval_days 
-where date_traffic = """+day+""" ;""";
-		if hasattr(opts, 'thismonth'):
+from view_traffic_ratio_interval_days 
+where date_traffic = """+str(opts['day'])+""" ;""";
+		if 'thismonth' in opts:
 			qry="""
 select 
-	date_traffic,
-	ratio_TrafficJam,
+	date_traffic::char(10),
+	ratio_TrafficJam::char(8),
 	flag_validity
-from view_traffic_interval_days 
+from view_traffic_ratio_interval_days 
 where EXTRACT(MONTH FROM date_traffic) = EXTRACT(MONTH FROM now());""";
-		if hasattr(opts, 'month'):
+		if 'month' in opts:
 			qry="""
 select 
-	date_traffic,
-	ratio_TrafficJam,
+	date_traffic::char(10),
+	ratio_TrafficJam::char(8),
 	flag_validity
-from view_traffic_interval_days 
-where EXTRACT(MONTH FROM date_traffic) = EXTRACT(MONTH FROM """+opts.month+""");""";
+from view_traffic_ratio_interval_days 
+where EXTRACT(MONTH FROM date_traffic) = """+str(opts['month'])+""";""";
 		else:
 			return -2;
 	try:
