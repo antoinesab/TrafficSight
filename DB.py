@@ -21,11 +21,13 @@ def getTrafficPOSTGRES(dateStart,dateEnd):
 		);
 		conn.autocommit = True
 	except:
-		print('--I am unable to connect to the database')
-		return 0;
+		print('--I am unable to connect to the database getTrafficPOSTGRES')
+		return -2;
 
 	cur = conn.cursor()
 	qry=""" SELECT * FROM public."Traffic" where date_raw >=  """+str(dS)+""" and date_raw <"""+str(dE)+""" order by date_raw desc; """
+	
+	print(qry)
 	
 	try:
 		cur.execute(qry)
@@ -56,20 +58,27 @@ def getTrafficStatsPOSTGRES(opts):
 		);
 		conn.autocommit = True
 	except:
-		print('--I am unable to connect to the database')
-		return 0;
+		print('--I am unable to connect to the database getTrafficStatsPOSTGRES')
+		return -2;
 		
 	day_week=day_week=datetime.today().weekday()+1
+	date_forecast='current_date'
 	
 	if opts is not None:
-		if hasattr(opts, 'day_week'):
+		if 'day_week' in opts:
 			day_week=opts['day_week']
+	
+	if opts is not None:
+		if 'date_forecast' in opts:
+			date_forecast=str(opts['date_forecast'])+"'::date"	
 	
 	cur = conn.cursor()
 	qry=""" SELECT nb_traffic_stats,road_value_lvl_1,
 	road_value_lvl_2,road_value_lvl_3,road_value_lvl_4,
-	ind_day_week,EXTRACT(EPOCH FROM current_date+tm_traffic_stats) *1000 as date_raw FROM public."Traffic_Stats" where ind_day_week =  """+str(day_week)+""" 
+	ind_day_week,EXTRACT(EPOCH FROM '"""+str(date_forecast)+""" + tm_traffic_stats) *1000 as date_raw FROM public."Traffic_Stats" where ind_day_week =  """+str(day_week)+""" 
 	order by date_raw; """
+	
+	print(qry)
 	
 	try:
 		cur.execute(qry)
@@ -103,8 +112,8 @@ def insertTrafficPOSTGRES(obj):
 		);
 		conn.autocommit = True
 	except:
-		print('--I am unable to connect to the database')
-		return 0;
+		print('--I am unable to connect to the database insertTrafficPOSTGRES')
+		return -2;
 		
 	obj['id']=1
 	
@@ -152,8 +161,8 @@ def getAccidentPOSTGRES(dateStart,dateEnd):
 		);
 		conn.autocommit = True
 	except:
-		print('--I am unable to connect to the database')
-		return 0;
+		print('--I am unable to connect to the database getAccidentPOSTGRES')
+		return -2;
 
 	cur = conn.cursor()
 	qry=""" SELECT * FROM public."Accident" where date_debut_accident >=  '"""+str(dS)+"""' and date_debut_accident < '"""+str(dE)+"""' ; """
@@ -212,7 +221,7 @@ select
 from view_traffic_ratio_interval_days 
 where EXTRACT(MONTH FROM date_traffic) = """+str(opts['month'])+""";""";
 		else:
-			return -2;
+			return -3;
 	try:
 		c=trafficSight_conf.getDBconf()
 		conn = psycopg2.connect(
@@ -223,8 +232,8 @@ where EXTRACT(MONTH FROM date_traffic) = """+str(opts['month'])+""";""";
 		);
 		conn.autocommit = True
 	except:
-		print('--I am unable to connect to the database')
-		return 0;
+		print('--I am unable to connect to the database getDailyReportPOSTGRES')
+		return -2;
 	cur = conn.cursor()
 	
 	try:
@@ -255,8 +264,8 @@ def insertAccidentPOSTGRES(obj):
 		);
 		conn.autocommit = True
 	except:
-		print('--I am unable to connect to the database')
-		return 0;
+		print('--I am unable to connect to the database insertAccidentPOSTGRES')
+		return -2;
 		
 	obj['id']=1
 	
@@ -278,7 +287,7 @@ def insertAccidentPOSTGRES(obj):
 		print(cur.query.decode("utf-8"))
 	if cur.fetchall():
 		print('existe deja')
-		return 0
+		return -4
 	else:
 		print('new')
 

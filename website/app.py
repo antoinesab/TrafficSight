@@ -19,43 +19,59 @@ def index():
 	#specifique time
 	#dStart = datetime.strptime( "2017-03-26T10:00:00", "%Y-%m-%dT%H:%M:%S" )
 	#dEnd   = datetime.strptime( "2017-03-26T22:08:12", "%Y-%m-%dT%H:%M:%S" )
+
 	
 	dStart = datetime.today().replace(hour=5,minute=0,second=0)
 	dEnd   = datetime.today().replace(hour=23,minute=59,second=59)
-	datas         = DB.getTrafficPOSTGRES(dStart,dEnd)
-	datasForecast = DB.getTrafficStatsPOSTGRES(0)
 	
-	for data in datas:
-		#on normalise
-		totalKM=data['r1']+data['r2']+data['r3']+data['r4']
-		data['r1'] = int(Sytadin.normalizeKM(totalKM,data['r1']))
-		data['r2'] = int(Sytadin.normalizeKM(totalKM,data['r2']))
-		data['r3'] = int(Sytadin.normalizeKM(totalKM,data['r3']))
-		data['r4'] = int(Sytadin.normalizeKM(totalKM,data['r4']))
+	day = request.args.get('day')
+	if day is not None:
+		dStart = datetime.strptime( day, "%Y%m%d" ).replace(hour=5,minute=0,second=0)
+		dEnd   = datetime.strptime( day, "%Y%m%d" ).replace(hour=23,minute=59,second=59)
+		
+	datas         = DB.getTrafficPOSTGRES(dStart,dEnd)
+	datasForecast = DB.getTrafficStatsPOSTGRES({'date_forecast':day})
+	dataDailyReport = DB.getDailyReportPOSTGRES({'month':2});
+	
+	if datas != -1:
+		for data in datas:
+			#on normalise
+			totalKM=data['r1']+data['r2']+data['r3']+data['r4']
+			data['r1'] = int(Sytadin.normalizeKM(totalKM,data['r1']))
+			data['r2'] = int(Sytadin.normalizeKM(totalKM,data['r2']))
+			data['r3'] = int(Sytadin.normalizeKM(totalKM,data['r3']))
+			data['r4'] = int(Sytadin.normalizeKM(totalKM,data['r4']))
+			
+			
+			#on scale en KM
+			data['r1'] = int(Sytadin.scalePixelToKm(data['r1']))
+			data['r2'] = int(Sytadin.scalePixelToKm(data['r2']))
+			data['r3'] = int(Sytadin.scalePixelToKm(data['r3']))
+			data['r4'] = int(Sytadin.scalePixelToKm(data['r4']))
+		
+	if datasForecast != -1:
+		for dataForecast in datasForecast:
+			totalKM=dataForecast['fr1']+dataForecast['fr2']+dataForecast['fr3']+dataForecast['fr4']
+			dataForecast['fr1'] = int(Sytadin.normalizeKM(totalKM,dataForecast['fr1']))
+			dataForecast['fr2'] = int(Sytadin.normalizeKM(totalKM,dataForecast['fr2']))
+			dataForecast['fr3'] = int(Sytadin.normalizeKM(totalKM,dataForecast['fr3']))
+			dataForecast['fr4'] = int(Sytadin.normalizeKM(totalKM,dataForecast['fr4']))
+			
+			
+			#on scale en KM
+			dataForecast['fr1'] = int(Sytadin.scalePixelToKm(dataForecast['fr1']))
+			dataForecast['fr2'] = int(Sytadin.scalePixelToKm(dataForecast['fr2']))
+			dataForecast['fr3'] = int(Sytadin.scalePixelToKm(dataForecast['fr3']))
+			dataForecast['fr4'] = int(Sytadin.scalePixelToKm(dataForecast['fr4']))
 		
 		
-		#on scale en KM
-		data['r1'] = int(Sytadin.scalePixelToKm(data['r1']))
-		data['r2'] = int(Sytadin.scalePixelToKm(data['r2']))
-		data['r3'] = int(Sytadin.scalePixelToKm(data['r3']))
-		data['r4'] = int(Sytadin.scalePixelToKm(data['r4']))
-		
-		
-	for dataForecast in datasForecast:
-		totalKM=dataForecast['fr1']+dataForecast['fr2']+dataForecast['fr3']+dataForecast['fr4']
-		dataForecast['fr1'] = int(Sytadin.normalizeKM(totalKM,dataForecast['fr1']))
-		dataForecast['fr2'] = int(Sytadin.normalizeKM(totalKM,dataForecast['fr2']))
-		dataForecast['fr3'] = int(Sytadin.normalizeKM(totalKM,dataForecast['fr3']))
-		dataForecast['fr4'] = int(Sytadin.normalizeKM(totalKM,dataForecast['fr4']))
-		
-		
-		#on scale en KM
-		dataForecast['fr1'] = int(Sytadin.scalePixelToKm(dataForecast['fr1']))
-		dataForecast['fr2'] = int(Sytadin.scalePixelToKm(dataForecast['fr2']))
-		dataForecast['fr3'] = int(Sytadin.scalePixelToKm(dataForecast['fr3']))
-		dataForecast['fr4'] = int(Sytadin.scalePixelToKm(dataForecast['fr4']))
+	
 
-	data_json = json.dumps(({'current_traffic':datas,'forecast_traffic':datasForecast}))
+	data_json = json.dumps(({
+		'current_traffic':datas,
+		'forecast_traffic':datasForecast,
+		'daily_report':dataDailyReport
+	}))
 	#data_json = json.dumps(datas)
 	return render_template("index.html",data_json=data_json)
 

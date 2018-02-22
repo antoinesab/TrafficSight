@@ -121,6 +121,16 @@ console.log(JSONObject)
 var heightLinechart=parseInt(d3.select("#linechart-container").style("height"));
 var widthLinechart =parseInt(d3.select("#linechart-container").style("width"));
 
+/*Rework date */
+//var dateCurrentTraffic=new Date(0);
+//	dateCurrentTraffic.setUTCSeconds(JSONObject.current_traffic[0].date_raw/1000);
+//var dateForecastTraffic=new Date(0);
+//	dateForecastTraffic.setUTCSeconds(JSONObject.forecast_traffic[0].date_raw/1000);
+//	dateForecastTraffic.setDate(dateCurrentTraffic.getDate());
+//	dateForecastTraffic.setMonth(dateCurrentTraffic.getMonth());
+//	dateForecastTraffic.setFullYear(dateCurrentTraffic.getFullYear());
+//console.log(dateCurrentTraffic);
+//console.log(dateForecastTraffic);
 
 
 var svg = d3.select(".linechart");
@@ -218,14 +228,14 @@ var line5 = d3.line()
       .attr("d", line4);
 	  */
 	  
-  g.append("path")
-      .datum(JSONObject.forecast_traffic)
-      .attr("fill", "none")
-      .attr("stroke", "black")
-      .attr("stroke-linejoin", "round")
-      .attr("stroke-linecap", "round")
-      .attr("stroke-width", 1.5)
-      .attr("d", line5);
+ g.append("path")
+     .datum(JSONObject.forecast_traffic)
+     .attr("fill", "none")
+     .attr("stroke", "black")
+     .attr("stroke-linejoin", "round")
+     .attr("stroke-linecap", "round")
+     .attr("stroke-width", 1.5)
+     .attr("d", line5);
 	  
 var legend_keys = [{name:"Prévision",color:"black"},{name:"En direct",color:"red"}];
 
