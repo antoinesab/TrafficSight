@@ -259,7 +259,8 @@ offsetLeft = ($('#calendar-block-1')[0].offsetWidth-(7*40))/2;
 
 var calendar = d3.select(".calendar")
 
-var scaleCalendar = d3.scaleLinear().domain([0, d3.max(JSONObject.daily_report.map(x => x['ratio_TrafficJam']) )]).range([0, 1]);
+//var scaleCalendar = d3.scaleLinear().domain([0, d3.max(JSONObject.daily_report.map(x => x['ratio_TrafficJam']) )]).range([0, 1]);
+var scaleCalendar = d3.scaleLinear().domain([0, 10]).range([0, 1]);
  
 var calendar_legend=calendar.append("g")
 	calendar_legend.append("text").text("Lun").attr("transform","translate("+(offsetLeft+6)+",40)");
