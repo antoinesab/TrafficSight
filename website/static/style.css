@@ -31,3 +31,13 @@ body {
 border: 1px solid #e5e5e5;
 background-color:#FFF;
 }
+
+.calendar-body{
+padding-left:0px;
+padding-right:0px;
+}
+
+.calendar-body  .row{
+	margin-left:0px;
+	margin-right:0px;
+}

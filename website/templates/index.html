@@ -82,10 +82,8 @@
           <!-- Categories Widget -->
           <div class="card my-4">
             <h5 class="card-header">Historique</h5>
-            <div class="card-body">
-              <div class="row">
-					<svg class="calendar" width="300" height="300"></svg>
-              </div>
+            <div class="calendar-body" id="calendar-block-1">
+				<svg class="calendar" width="400" height="300"></svg>
             </div>
           </div>
 
@@ -257,21 +255,56 @@ lineLegend.append("rect")
 	
 /* Calendar*/
 
+offsetLeft = ($('#calendar-block-1')[0].offsetWidth-(7*40))/2;
+
 var calendar = d3.select(".calendar")
 
+var scaleCalendar = d3.scaleLinear().domain([0, d3.max(JSONObject.daily_report.map(x => x['ratio_TrafficJam']) )]).range([0, 1]);
  
+var calendar_legend=calendar.append("g")
+	calendar_legend.append("text").text("Lun").attr("transform","translate("+(offsetLeft+6)+",40)");
+	calendar_legend.append("text").text("Mar").attr("transform","translate("+(offsetLeft+46)+",40)");
+	calendar_legend.append("text").text("Mer").attr("transform","translate("+(offsetLeft+86)+",40)");
+	calendar_legend.append("text").text("Jeu").attr("transform","translate("+(offsetLeft+126)+",40)");
+	calendar_legend.append("text").text("Ven").attr("transform","translate("+(offsetLeft+166)+",40)");
+	calendar_legend.append("text").text("Sam").attr("transform","translate("+(offsetLeft+206)+",40)");
+	calendar_legend.append("text").text("Dim").attr("transform","translate("+(offsetLeft+246)+",40)");
  
- var calendar_blocks = calendar.selectAll(".dayblock")
+//Ajout jours fictifs pour commencer le calendrier au bon endroit
+ 
+var dayBeginCalendar=new Date(JSONObject.daily_report[0]['date_traffic']).getDay()
+console.log(dayBeginCalendar)
+for(i=0;i<dayBeginCalendar-1;i++) {
+	JSONObject.daily_report.unshift({date_traffic:'XXXX-XX-XX',flag_validity:'KO',ratio_TrafficJam:'0'})
+}
+var calendar_blocks = calendar.selectAll(".dayblock")
   .data(JSONObject.daily_report)
 	.enter()
-	.append("rect")
-	.attr("class", "dayblock")
-	.attr("fill", function (d, i) {return "white";})
-	.attr("stroke", function (d, i) {return "black";})
-    .attr("width", 40)
-	.attr("height", 40)
-	.attr("x", function (d,i) { return (i%7)*40;})
-	.attr("y", function (d,i) { return Math.trunc(i/7)*40;})
+	.append("g")
+	
+
+		
+	
+	calendar_blocks.append("rect")
+		.attr("class", "dayblock")                    
+		.attr("stroke", function (d, i) { 
+			if(d['date_traffic']=='XXXX-XX-XX') {return "white"} //Si fausse date
+			else return "black";
+		})
+		.attr("width", 40)
+		.attr("height", 40)
+		.attr("fill",function (d,i) { 
+			if(d['date_traffic']=='XXXX-XX-XX') {return "white"} //Si fausse date
+			else return d3.interpolateRdYlGn(scaleCalendar(d['ratio_TrafficJam']))
+		})
+		.attr("x", function (d,i) { return (i%7)*40+offsetLeft;})
+		.attr("y", function (d,i) { return Math.trunc(i/7)*40+60;})
+
+	calendar_blocks.append("text").text(function (d) {
+			if(d['date_traffic']=='XXXX-XX-XX') {return ""} //Si fausse date
+			else return d['date_traffic'].substr(8,2);
+		})
+		.attr("transform", function (d,i) { return "translate("+((i%7)*40+12+offsetLeft)+","+(Math.trunc(i/7)*40+25+60)+")";}); //align texts with boxes
 	
 
 </script>
