@@ -53,13 +53,13 @@ def analyseTrafficImage(filename):
 
 	for i in range(0, nbX-1):
 		for j in range(0,nbY-1):
-			if(pix[i,j][0] > 235 and pix[i,j][0] < 250 and pix[i,j][1] < 70 and pix[i,j][1] > 55 and pix[i,j][2] < 55 and pix[i,j][2] > 45):
+			if(pix[i,j][0] > 240 and pix[i,j][0] < 250 and pix[i,j][1] < 70 and pix[i,j][2] < 60):
 				pixelsBouchons=pixelsBouchons+1
-			if(pix[i,j][0] > 95 and pix[i,j][0] < 105 and pix[i,j][1] < 220 and pix[i,j][1] > 205 and pix[i,j][2] < 110 and pix[i,j][2] > 100):
+			if(pix[i,j][0] > 90 and pix[i,j][0] < 110 and pix[i,j][1] < 220 and pix[i,j][1] > 210 and pix[i,j][2] < 110 and pix[i,j][2] > 95):
 				pixelsFluide=pixelsFluide+1
-			if(pix[i,j][0] > 250 and pix[i,j][0] < 256 and pix[i,j][1] < 160 and pix[i,j][1] > 145 and pix[i,j][2] < 80 and pix[i,j][2] > 75):
+			if(pix[i,j][0] > 250 and pix[i,j][0] < 256 and pix[i,j][1] < 155 and pix[i,j][1] > 145 and pix[i,j][2] < 85 and pix[i,j][2] > 70):
 				pixelsIntermediaire=pixelsIntermediaire+1
-			if(pix[i,j][0] > 125 and pix[i,j][0] < 135 and pix[i,j][1] < 32 and pix[i,j][1] > 27 and pix[i,j][2] < 32 and pix[i,j][2] > 27 ):
+			if(pix[i,j][0] > 120 and pix[i,j][0] < 135 and pix[i,j][1] < 35 and pix[i,j][1] > 25 and pix[i,j][2] < 35 and pix[i,j][2] > 25):
 				pixelsGrosBouchons=pixelsGrosBouchons+1
 
 	
