@@ -8,7 +8,7 @@ $(document).ready(function(){
 	
 	JSONObject.current_traffic.forEach(function (e,i) {
 		if(e.date_raw==max_date_raw) {
-			current_trafic_jam=e.r4+e.r3+e.r2;
+			current_trafic_jam=e.r4+e.r3;
 			index_current=i;
 		}
 	});
