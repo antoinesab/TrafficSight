@@ -195,7 +195,8 @@ select
 	ratio_TrafficJam::char(8),
 	flag_validity
 from view_traffic_ratio_interval_days 
-where date_traffic = now() ;""";
+where date_traffic = now()
+ ;""";
 		if 'day' in opts:
 			qry="""
 select 
@@ -207,19 +208,59 @@ where date_traffic = """+str(opts['day'])+""" ;""";
 		if 'thismonth' in opts:
 			qry="""
 select 
-	date_traffic::char(10),
-	ratio_TrafficJam::char(8),
-	flag_validity
-from view_traffic_ratio_interval_days 
-where EXTRACT(MONTH FROM date_traffic) = EXTRACT(MONTH FROM now());""";
+date_traffic,
+ratio_TrafficJam,
+flag_validity
+from (
+select *, row_number() over (partition by date_traffic order by validity desc) as seq
+	from (
+		select 
+			date_traffic::char(10),
+			ratio_TrafficJam::char(8),
+			flag_validity,
+			1 as validity
+		from view_traffic_ratio_interval_days 
+		where EXTRACT(MONTH FROM date_traffic) = EXTRACT(MONTH FROM now())
+		and EXTRACT(YEAR FROM date_traffic) = EXTRACT(YEAR FROM now())
+		union all
+		select i::char(10),v::char(8),c,0 as validity from (
+		select *,  -1 as v,'KO' c  from (
+		select i::date from generate_series(date_trunc('month', current_date), 
+		  (date_trunc('month', current_date::date) + interval '1 month' - interval '1 day')::date, '1 day'::interval) i) t
+		  ) t2
+	 ) t3
+ )t4
+where seq = 1
+order by date_traffic
+ ;""";
 		if 'month' in opts:
 			qry="""
 select 
-	date_traffic::char(10),
-	ratio_TrafficJam::char(8),
-	flag_validity
-from view_traffic_ratio_interval_days 
-where EXTRACT(MONTH FROM date_traffic) = """+str(opts['month'])+""";""";
+date_traffic,
+ratio_TrafficJam,
+flag_validity
+from (
+select *, row_number() over (partition by date_traffic order by validity desc) as seq
+	from (
+		select 
+			date_traffic::char(10),
+			ratio_TrafficJam::char(8),
+			flag_validity,
+			1 as validity
+		from view_traffic_ratio_interval_days 
+		where EXTRACT(MONTH FROM date_traffic) = """+str(opts['month'])+"""
+		and EXTRACT(YEAR FROM date_traffic) = EXTRACT(YEAR FROM now())
+		union all
+		select i::char(10),v::char(8),c,0 as validity from (
+		select *,  -1 as v,'KO' c  from (
+		select i::date from generate_series(date_trunc('month', ( extract(year from current_date)||'-01-01')::date+ interval '"""+str((int(opts['month'])-1))+""" month'), 
+		  (date_trunc('month', (extract(year from current_date)||'-01-01')::date+ interval '"""+str((int(opts['month'])-1))+""" month') + interval '1 month' - interval '1 day')::date, '1 day'::interval) i) t
+		  ) t2
+	 ) t3
+ )t4
+where seq = 1
+order by date_traffic
+;""";
 		else:
 			return -3;
 	try:

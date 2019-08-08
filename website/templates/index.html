@@ -296,6 +296,7 @@ var calendar_blocks = calendar.selectAll(".dayblock")
 		.attr("height", 40)
 		.attr("fill",function (d,i) { 
 			if(d['date_traffic']=='XXXX-XX-XX') {return "white"} //Si fausse date
+			if(parseInt(d['ratio_TrafficJam'])==-1) {return "white"}
 			else return d3.interpolateRdYlGn(scaleCalendar(d['ratio_TrafficJam']))
 		})
 		.attr("x", function (d,i) { return (i%7)*40+offsetLeft;})

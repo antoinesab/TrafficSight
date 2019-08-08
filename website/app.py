@@ -24,7 +24,9 @@ def index():
 	dStart = datetime.today().replace(hour=5,minute=0,second=0)
 	dEnd   = datetime.today().replace(hour=23,minute=59,second=59)
 	
-	month = datetime.now().month
+	month = request.args.get('month')
+	if month is None:
+		month = datetime.now().month
 	
 	day = request.args.get('day')
 	if day is not None:
