@@ -6,11 +6,12 @@
 	<script type="text/javascript" src="{{ url_for('static', filename='jquery.slim.min.js') }}"></script>
 	<script type="text/javascript" src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
 	<script type="text/javascript" src="{{ url_for('static', filename='d3.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='element_manager.js') }}"></script>
 	
 	
 	<!-- Bootstrap core CSS -->
    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-
+	<script src="https://kit.fontawesome.com/02c264cb23.js"></script>
 
 	<link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
 	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
@@ -24,7 +25,10 @@
        <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div class="container">
-        <a class="navbar-brand" href="#"><h1>MyTraffic</h1></a>
+        <a class="navbar-brand" href="#"><div><span style="font-size:35px">Trafic-idf</span><i class="fas fa-car fa-xs"></i><span style="font-size:35px">eu</span>
+		
+		<img style="width:50px;height:50px;" alt="Responsive image"  class="img-fluid d-none"  src="{{ url_for('static', filename='ico-idf.png') }}"/>
+		</div></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -54,22 +58,35 @@
       <div class="row">
 
         <!-- Blog Entries Column -->
-        <div class="col-md-8">
+        <div class="col-md-8" style="height:100%">
 
           <h1 class="my-4">Cumul des bouchons 
             <small>Ile de France</small>
           </h1>
 
           <!-- Blog Post -->
-          <div class="card mb-4" id="linechart-container">
+          <div class="card mb-4" id="linechart-container" style="min-height:600px;">
            <svg class="linechart" ></svg>
-            <div class="card-body">
-              <h2 class="card-title">Situation normale</h2>
-              <p class="card-text">Trafic normal aux prévisions</p>
+            <div class="card-body alert alert-secondary d-none" id="traffic-state-1">
+              <h2 class="card-title ">Circulation fluide</i></h2>
+              <p class="card-text forecast-state-1 d-none">Conforme aux prévisions <span class="float-right nb_kilometer-jam"></span></p>
+			  <p class="card-text text-success forecast-state-2 d-none">Meilleur que prévu <span class="float-right nb_kilometer-jam"></span></p>
+			  <p class="card-text text-danger forecast-state-3 d-none">Pire que les prévisions <span class="float-right nb_kilometer-jam"></span></p>
+            </div>
+			<div class="card-body alert alert-secondary d-none" id="traffic-state-2">
+              <h2 class="card-title ">Circulation qui se densifie</h2>
+              <p class="card-text  forecast-state-1 d-none">Conforme aux prévisions <span class="float-right nb_kilometer-jam"></span></p>
+			  <p class="card-text text-success forecast-state-2 d-none">Meilleur que prévu <span class="float-right nb_kilometer-jam"></span></p>
+			  <p class="card-text text-danger  forecast-state-3 d-none">Pire que les prévisions<span class="float-right nb_kilometer-jam"></span></p>
+            </div>
+			<div class="card-body alert alert-secondary d-none" id="traffic-state-3">
+              <h2 class="card-title ">Circulation difficile</h2>
+              <p class="card-text forecast-state-1 d-none">Conforme aux prévisions <span class="float-right nb_kilometer-jam"></span></p>
+			  <p class="card-text text-success forecast-state-2 d-none">Meilleur que prévu <span class="float-right nb_kilometer-jam"></span></p>
+			  <p class="card-text text-danger  forecast-state-3 d-none">Pire que les prévisions <span class="float-right nb_kilometer-jam"></span></p>
             </div>
             <div class="card-footer text-muted">
-              Dernière actualisation à 19:02
-              <a href="#">None</a>
+              Dernière actualisation à <span id="last-refresh"> - Pas d'actualisation aujourd'hui - </span>
             </div>
           </div>
 
@@ -87,6 +104,12 @@
             </div>
           </div>
 
+		  <div class="card my-4">
+            <h5 class="card-header">Temps réel</h5>
+            <div class="map-body" id="map-image">
+				<img class="img-fluid" alt="Responsive image" src="{{url_for('static', filename='current_img.png')}}" />
+            </div>
+          </div>
 
 
         </div>

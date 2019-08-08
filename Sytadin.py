@@ -3,6 +3,7 @@ from PIL import Image
 import os, re
 import psycopg2
 from datetime import datetime
+from shutil import copyfile
 import DB
 
 PIXEL_PER_KM = 40.8
@@ -16,6 +17,8 @@ def main():
 		createDAYRepositoryIFNOTEXISTS(nowDT)
 		runExtractGMData()
 		lastImage=getOldedImage()
+		#move to website
+		copyfile('StImages/'+lastImage['filename'], 'website/static/current_img.png');
 		pathImage=removeImageToDayRepository(lastImage['filename'],str(nowDT.date()))
 		resTraffic=analyseTrafficImage(pathImage)
 		DB.insertTrafficPOSTGRES({
