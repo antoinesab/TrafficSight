@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask import render_template
 import sys, os,time
-from datetime import datetime
+from datetime import datetime,date
 import json
 sys.path.insert(0, '../')
 import DB
@@ -32,6 +32,9 @@ def index():
 	if day is not None:
 		dStart = datetime.strptime( day, "%Y%m%d" ).replace(hour=5,minute=0,second=0)
 		dEnd   = datetime.strptime( day, "%Y%m%d" ).replace(hour=23,minute=59,second=59)
+	else:
+		tday=date.today()
+		day=tday.strftime("%Y%m%d")
 		
 	datas         = DB.getTrafficPOSTGRES(dStart,dEnd)
 	datasForecast = DB.getTrafficStatsPOSTGRES({'date_forecast':day})

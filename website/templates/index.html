@@ -192,7 +192,7 @@ var line5 = d3.line()
 
 	
   x.domain(d3.extent(JSONObject.forecast_traffic, function(d) { return d.date_raw; }));
-  y.domain([0,d3.max(JSONObject.current_traffic, function(d) { return (0+d.r4+d.r3); })+150]);
+  y.domain([0,d3.max(JSONObject.current_traffic, function(d) { return (0+d.r4+d.r3); })+200]);
   /*y.domain([0,800]);*/
 
   g.append("g")
