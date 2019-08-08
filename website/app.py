@@ -24,6 +24,8 @@ def index():
 	dStart = datetime.today().replace(hour=5,minute=0,second=0)
 	dEnd   = datetime.today().replace(hour=23,minute=59,second=59)
 	
+	month = datetime.now().month
+	
 	day = request.args.get('day')
 	if day is not None:
 		dStart = datetime.strptime( day, "%Y%m%d" ).replace(hour=5,minute=0,second=0)
@@ -31,7 +33,7 @@ def index():
 		
 	datas         = DB.getTrafficPOSTGRES(dStart,dEnd)
 	datasForecast = DB.getTrafficStatsPOSTGRES({'date_forecast':day})
-	dataDailyReport = DB.getDailyReportPOSTGRES({'month':2});
+	dataDailyReport = DB.getDailyReportPOSTGRES({'month':month});
 	
 	if datas != -1:
 		for data in datas:
