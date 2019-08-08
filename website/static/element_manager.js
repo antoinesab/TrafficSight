@@ -30,11 +30,11 @@ $(document).ready(function(){
 		//conforme prévisions
 		$('.forecast-state-1').removeClass('d-none');
 	} else if (current_trafic_jam < 0.7*reference_traffic_jam) {
-		//prévision suréstimés
-		$('.forecast-state-2').removeClass('d-none');
-	} else {
 		//prévision souséstimés
 		$('.forecast-state-3').removeClass('d-none');
+	} else {
+		//prévision  suréstimés
+		$('.forecast-state-2').removeClass('d-none');
 	}
 	
 	if(current_trafic_jam<100) {
